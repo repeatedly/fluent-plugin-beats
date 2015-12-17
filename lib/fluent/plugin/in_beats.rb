@@ -69,8 +69,6 @@ module Fluent
       @thread.join
     end
 
-    FILEBEAT_MESSAGE = 'message'
-
     def run
       until @lumberjack.closed?
         conn = @lumberjack.accept
