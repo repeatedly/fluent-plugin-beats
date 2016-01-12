@@ -59,3 +59,7 @@ Configuration example:
   * Add `Server::Connection#closed?` to check connection is dead or not
   * Remove `id_stream` argument from `Server::Connection#run` block
 * From lumberjack limitation, this plugin launches one thread for each connection. You can mitigate this problem by `max_connections`.
+
+## Slide
+
+Talk at Elasticsearch meetup #14: [Fluentd meets Beats](http://www.slideshare.net/repeatedly/fluentpluginbeats-at-elasticsearch-meetup-14)
