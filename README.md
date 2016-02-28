@@ -39,7 +39,7 @@ Configuration example:
 
 **metadata_as_tag**
 
-  Use `record['@metadata']['beat']` value instead of fixed tag. Available values are `filebeat`, `packetbeat` and `topbeat`.
+  Use `record['@metadata']['beat']` value instead of fixed tag.
 
 **format**
 
