@@ -15,6 +15,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
+require 'fluent/input'
+
 module Fluent
   class BeatsInput < Input
     Plugin.register_input('beats', self)
@@ -89,7 +92,7 @@ module Fluent
             conn.run { |map|
               tag = @metadata_as_tag ? map['@metadata']['beat'] : @tag
 
-              if map.has_key?('message') &&  @format
+              if map.has_key?('message') && @format
                 message = map.delete('message')
                 @parser.parse(message) { |time, record|
                   record['@timestamp'] = map['@timestamp']
