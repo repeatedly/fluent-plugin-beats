@@ -17,6 +17,7 @@
 #
 
 require 'fluent/input'
+require 'fluent/parser'
 
 module Fluent
   class BeatsInput < Input
@@ -48,7 +49,7 @@ module Fluent
         raise ConfigError,  "'tag' or 'metadata_as_tag' parameter is required on beats input"
       end
 
-      @time_parser = TextParser::TimeParser.new('%Y-%m-%dT%H:%M:%S.%N%z')
+      @time_parser = Fluent::TextParser::TimeParser.new('%Y-%m-%dT%H:%M:%S.%N%z')
       if @format
         @parser = Plugin.new_parser(@format)
         @parser.configure(conf)
@@ -57,6 +58,8 @@ module Fluent
     end
 
     def start
+      super
+
       @lumberjack = Lumberjack::Beats::Server.new(
         :address => @bind, :port => @port, :ssl => @use_ssl, :ssl_certificate => @ssl_certificate,
         :ssl_key => @ssl_key, :ssl_key_passphrase => @ssl_key_passphrase)
@@ -70,6 +73,8 @@ module Fluent
       @lumberjack.close rescue nil
       @thread_pool.shutdown
       @thread.join
+
+      super
     end
 
     def run
