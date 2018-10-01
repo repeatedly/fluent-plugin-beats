@@ -15,21 +15,21 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+require "lumberjack/beats"
+require "lumberjack/beats/server"
+require 'concurrent/executor/cached_thread_pool'
 
-require 'fluent/input'
-require 'fluent/parser'
+require 'fluent/plugin/input'
+require 'fluent/plugin/parser'
+require 'fluent/time'
 
-module Fluent
+module Fluent::Plugin
   class BeatsInput < Input
-    Plugin.register_input('beats', self)
+    Fluent::Plugin.register_input('beats', self)
 
-    def initialize
-      super
+    helpers :compat_parameters, :parser, :thread
 
-      require "lumberjack/beats"
-      require "lumberjack/beats/server"
-      require 'concurrent/executor/cached_thread_pool'
-    end
+    DEFAULT_PARSER = 'json'.freeze
 
     config_param :port, :integer, :default => 5044
     config_param :bind, :string, :default => '0.0.0.0'
@@ -42,17 +42,22 @@ module Fluent
     config_param :ssl_key, :string, :default => nil
     config_param :ssl_key_passphrase, :string, :default => nil
 
+    config_section :parse do
+      config_set_default :@type, DEFAULT_PARSER
+    end
+
     def configure(conf)
+      compat_parameters_convert(conf, :parser)
       super
 
       if !@tag && !@metadata_as_tag
-        raise ConfigError,  "'tag' or 'metadata_as_tag' parameter is required on beats input"
+        raise Fluent::ConfigError,  "'tag' or 'metadata_as_tag' parameter is required on beats input"
       end
 
       @time_parser = Fluent::TextParser::TimeParser.new('%Y-%m-%dT%H:%M:%S.%N%z')
+
       if @format
-        @parser = Plugin.new_parser(@format)
-        @parser.configure(conf)
+        @parser = parser_create
       end
       @connections = []
     end
@@ -66,13 +71,12 @@ module Fluent
       # Lumberjack::Beats::Server depends on normal accept so we need to launch thread for each connection.
       # TODO: Re-implement Beats Server with Cool.io for resource control
       @thread_pool = Concurrent::CachedThreadPool.new(:idletime => 15) # idletime setting is based on logstash beats input
-      @thread = Thread.new(&method(:run))
+      thread_create(:in_beats_runner, &method(:run))
     end
 
     def shutdown
       @lumberjack.close rescue nil
       @thread_pool.shutdown
-      @thread.join
 
       super
     end
@@ -88,7 +92,7 @@ module Fluent
             conn.close # close for retry on beats side
             sleep 1
             next
-          end          
+          end
           @connections << conn
         end
 
