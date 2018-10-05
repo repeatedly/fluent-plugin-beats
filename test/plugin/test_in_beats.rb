@@ -112,7 +112,7 @@ class BeatsInputTest < Test::Unit::TestCase
     assert_equal es.length, 1
 
     _tag, time, record = es[0]
-    assert_equal now, time
+    assert_in_delta now, time, 1.0
     assert_equal record["@timestamp"], timestamp
     assert_equal record, expected
   end

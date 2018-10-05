@@ -31,13 +31,12 @@ module Fluent::Plugin
 
     helpers :compat_parameters, :parser, :thread
 
-    DEFAULT_PARSER = 'json'.freeze
+    DEFAULT_PARSER = 'none'.freeze
 
     config_param :port, :integer, :default => 5044
     config_param :bind, :string, :default => '0.0.0.0'
     config_param :tag, :string, :default => nil
     config_param :metadata_as_tag, :bool, :default => nil
-    config_param :format, :string, :default => nil
     config_param :max_connections, :integer, :default => nil # CachedThreadPool can't limit the number of threads
     config_param :use_ssl, :string, :default => false
     config_param :ssl_certificate, :string, :default => nil
@@ -58,9 +57,8 @@ module Fluent::Plugin
 
       @time_parser = time_parser_create(format: '%Y-%m-%dT%H:%M:%S.%N%z')
 
-      if @format
-        @parser = parser_create
-      end
+      @parser_config = conf.elements('parse').first
+      @parser = parser_create
       @connections = []
     end
 
@@ -103,7 +101,7 @@ module Fluent::Plugin
             conn.run { |map|
               tag = @metadata_as_tag ? map['@metadata']['beat'] : @tag
 
-              if map.has_key?('message') && @format
+              if map.has_key?('message') && @parser_config
                 message = map.delete('message')
                 @parser.parse(message) { |time, record|
                   record['@timestamp'] = map['@timestamp']
