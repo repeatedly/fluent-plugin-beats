@@ -27,6 +27,8 @@ module Fluent::Plugin
   class BeatsInput < Input
     Fluent::Plugin.register_input('beats', self)
 
+    include Fluent::TimeMixin::Parser
+
     helpers :compat_parameters, :parser, :thread
 
     DEFAULT_PARSER = 'json'.freeze
@@ -54,7 +56,7 @@ module Fluent::Plugin
         raise Fluent::ConfigError,  "'tag' or 'metadata_as_tag' parameter is required on beats input"
       end
 
-      @time_parser = Fluent::TextParser::TimeParser.new('%Y-%m-%dT%H:%M:%S.%N%z')
+      @time_parser = time_parser_create(format: '%Y-%m-%dT%H:%M:%S.%N%z')
 
       if @format
         @parser = parser_create
