@@ -58,7 +58,9 @@ module Fluent::Plugin
       @time_parser = time_parser_create(format: '%Y-%m-%dT%H:%M:%S.%N%z')
 
       @parser_config = conf.elements('parse').first
-      @parser = parser_create
+      if @parser_config
+        @parser = parser_create
+      end
       @connections = []
     end
 
