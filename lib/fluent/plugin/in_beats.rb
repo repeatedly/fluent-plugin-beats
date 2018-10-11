@@ -19,9 +19,9 @@
 require 'fluent/input'
 require 'fluent/parser'
 
-module Fluent
+module Fluent::Plugin
   class BeatsInput < Input
-    Plugin.register_input('beats', self)
+    Fluent::Plugin.register_input('beats', self)
 
     def initialize
       super
@@ -42,8 +42,13 @@ module Fluent
     config_param :ssl_key, :string, :default => nil
     config_param :ssl_key_passphrase, :string, :default => nil
 
+    def multi_workers_ready?
+      true
+    end
+
     def configure(conf)
       super
+      @port += fluentd_worker_id
 
       if !@tag && !@metadata_as_tag
         raise ConfigError,  "'tag' or 'metadata_as_tag' parameter is required on beats input"
@@ -88,7 +93,7 @@ module Fluent
             conn.close # close for retry on beats side
             sleep 1
             next
-          end          
+          end
           @connections << conn
         end
 
