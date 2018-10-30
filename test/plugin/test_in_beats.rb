@@ -1,4 +1,5 @@
 require 'fluent/test'
+require 'fluent/test/driver/input'
 require 'fluent/plugin/in_beats'
 require 'lumberjack/beats/client'
 require 'helper'
@@ -18,7 +19,7 @@ class BeatsInputTest < Test::Unit::TestCase
   ]
 
   def create_driver(conf=CONFIG)
-    Fluent::Test::InputTestDriver.new(Fluent::BeatsInput).configure(conf)
+    Fluent::Test::Driver::Input.new(Fluent::Plugin::BeatsInput).configure(conf)
   end
 
   def create_client
@@ -52,11 +53,11 @@ class BeatsInputTest < Test::Unit::TestCase
       client.write(payload)
     end
 
-    tag, es = d.emit_streams[0]
-    assert_equal tag, 'test.beats'
+    es = d.events
+    assert_equal es[0][0], 'test.beats'
     assert_equal es.length, 1
 
-    time, record = es[0]
+    tag, time, record = es[0]
     assert_equal time.to_i, Time.parse(timestamp).to_i
     assert_equal record, payload
   end
@@ -76,12 +77,43 @@ class BeatsInputTest < Test::Unit::TestCase
       client.write(payload)
     end
 
-    tag, es = d.emit_streams[0]
-    assert_equal tag, 'heartbeat'
+    es = d.events
+    assert_equal es[0][0], 'heartbeat'
     assert_equal es.length, 1
 
-    time, record = es[0]
+    tag, time, record = es[0]
     assert_equal time.to_i, Time.parse(timestamp).to_i
     assert_equal record, payload
+  end
+
+  def test_input_as_json
+    d = create_driver(CONFIG + %[format json])
+
+    timestamp = '2018-01-01T12:30:00.000Z'
+    payload = {
+        '@metadata' => {'beat' => 'heartbeat'},
+        '@timestamp' => timestamp,
+        'message' => '{"msg":"as_json"}'
+    }
+    expected = {
+        '@metadata' => {'beat' => 'heartbeat'},
+        '@timestamp' => timestamp,
+        'msg' => 'as_json'
+    }
+
+    now = Fluent::Engine.now
+    d.run do
+      client = create_client
+      client.write(payload)
+    end
+
+    es = d.events
+    assert_equal es[0][0], 'test.beats'
+    assert_equal es.length, 1
+
+    _tag, time, record = es[0]
+    assert_in_delta now, time, 1.0
+    assert_equal record["@timestamp"], timestamp
+    assert_equal record, expected
   end
 end
