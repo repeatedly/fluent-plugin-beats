@@ -4,9 +4,16 @@
 
 This plugin uses lumberjack protocol for communicating with each beat.
 
+## Requirements
+
+| fluent-plugin-beats | fluentd | ruby |
+|-------------------|---------|------|
+| >= 1.0.0 | >= v1.0.0 | >= 2.1 |
+|  < 1.0.0 | >= v0.12.0 | >= 1.9 |
+
 ## Installation
 
-    $ gem install fluent-plugin-beats
+    $ gem install fluent-plugin-beats --no-document
 
 ## Configuration
 
@@ -28,6 +35,8 @@ Configuration example:
 **port**
 
   The port to listen to. Default Value is `5044`.
+
+  If you use this plugin under multi-process environment in v1, the plugin will be launched in each worker. Port is assigned in sequential number, e.g. 5044, 5045 ... 504N.
 
 **bind**
 
