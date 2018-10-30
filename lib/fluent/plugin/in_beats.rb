@@ -47,14 +47,20 @@ module Fluent::Plugin
       config_set_default :@type, DEFAULT_PARSER
     end
 
+    def multi_workers_ready?
+      true
+    end
+
     def configure(conf)
       compat_parameters_convert(conf, :parser)
+
       super
 
       if !@tag && !@metadata_as_tag
         raise Fluent::ConfigError,  "'tag' or 'metadata_as_tag' parameter is required on beats input"
       end
 
+      @port += fluentd_worker_id
       @time_parser = time_parser_create(format: '%Y-%m-%dT%H:%M:%S.%N%z')
 
       @parser_config = conf.elements('parse').first
