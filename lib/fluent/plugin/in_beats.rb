@@ -113,6 +113,8 @@ module Fluent::Plugin
                 message = map.delete('message')
                 @parser.parse(message) { |time, record|
                   record['@timestamp'] = map['@timestamp']
+                  log.info "data received: ", record
+                  log.info "from: ", record["beat"]["name"]
                   map.each { |k, v|
                     record[k] = v
                   }
