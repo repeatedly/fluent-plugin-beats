@@ -325,6 +325,8 @@ module Lumberjack module Beats
       Errno::ECONNRESET,
       Errno::EPIPE,
       Errno::EAGAIN,
+      Errno::EBADF,
+      Errno::EACCES,
       IO::EAGAINWaitReadable
       # EOF or other read errors, only action is to shutdown which we'll do in
       # 'ensure'
