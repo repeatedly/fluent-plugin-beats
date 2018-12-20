@@ -323,7 +323,8 @@ module Lumberjack module Beats
       OpenSSL::SSL::SSLError,
       IOError,
       Errno::ECONNRESET,
-      Errno::EPIPE
+      Errno::EPIPE,
+      IO::EAGAINWaitReadable
       # EOF or other read errors, only action is to shutdown which we'll do in
       # 'ensure'
     rescue
