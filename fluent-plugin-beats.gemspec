@@ -5,7 +5,7 @@ Gem::Specification.new do |gem|
   gem.name        = "fluent-plugin-beats"
   gem.description = "Elastic beats plugin for Fluentd event collector"
   gem.license     = "Apache-2.0"
-  gem.homepage    = "https://github.com/uchann2/fluent-plugin-beats.git"
+  gem.homepage    = "https://github.com/repeatedly/fluent-plugin-beats"
   gem.summary     = gem.description
   gem.version     = File.read("VERSION").strip
   gem.authors     = ["Masahiro Nakagawa"]
