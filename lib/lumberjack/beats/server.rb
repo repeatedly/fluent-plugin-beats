@@ -29,7 +29,9 @@ module Lumberjack module Beats
         :ssl => true,
         :ssl_certificate => nil,
         :ssl_key => nil,
-        :ssl_key_passphrase => nil
+        :ssl_key_passphrase => nil,
+        :ssl_version => nil,
+        :ssl_ciphers => nil,
       }.merge(options)
 
       if @options[:ssl]
@@ -51,6 +53,8 @@ module Lumberjack module Beats
       if @options[:ssl]
         # load SSL certificate
         @ssl = OpenSSL::SSL::SSLContext.new
+        @ssl.ssl_version = @options[:ssl_version]
+        @ssl.ciphers = @options[:ssl_ciphers]
         @ssl.cert = OpenSSL::X509::Certificate.new(File.read(@options[:ssl_certificate]))
         @ssl.key = OpenSSL::PKey::RSA.new(File.read(@options[:ssl_key]),
           @options[:ssl_key_passphrase])
