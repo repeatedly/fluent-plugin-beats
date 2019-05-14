@@ -36,6 +36,18 @@ class BeatsInputTest < Test::Unit::TestCase
     assert_equal PORT, d.instance.port
     assert_equal '127.0.0.1', d.instance.bind
     assert_equal 'test.beats', d.instance.tag
+    assert_false d.instance.use_ssl
+    assert_nil d.instance.ssl_certificate
+    assert_nil d.instance.ssl_key
+    assert_nil d.instance.ssl_key_passphrase
+    assert_nil d.instance.ssl_version
+    assert_nil d.instance.ssl_ciphers
+  end
+
+  def test_configure_without_tag_parameters
+    assert_raise Fluent::ConfigError.new("'tag' or 'metadata_as_tag' parameter is required on beats input") do
+      create_driver('')
+    end
   end
 
   def test_send_beat
