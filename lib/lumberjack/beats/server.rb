@@ -53,8 +53,12 @@ module Lumberjack module Beats
       if @options[:ssl]
         # load SSL certificate
         @ssl = OpenSSL::SSL::SSLContext.new
-        @ssl.ssl_version = @options[:ssl_version]
-        @ssl.ciphers = @options[:ssl_ciphers]
+        if @options[:ssl_version]
+          @ssl.ssl_version = @options[:ssl_version]
+        end
+        if @options[:ssl_ciphers]
+          @ssl.ciphers = @options[:ssl_ciphers]
+        end
         @ssl.cert = OpenSSL::X509::Certificate.new(File.read(@options[:ssl_certificate]))
         @ssl.key = OpenSSL::PKey::RSA.new(File.read(@options[:ssl_key]),
           @options[:ssl_key_passphrase])
