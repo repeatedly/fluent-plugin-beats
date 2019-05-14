@@ -42,6 +42,8 @@ module Fluent::Plugin
     config_param :ssl_certificate, :string, :default => nil
     config_param :ssl_key, :string, :default => nil
     config_param :ssl_key_passphrase, :string, :default => nil
+    config_param :ssl_version, :string, :default => nil
+    config_param :ssl_ciphers, :string, :default => nil
 
     config_section :parse do
       config_set_default :@type, DEFAULT_PARSER
@@ -75,7 +77,7 @@ module Fluent::Plugin
 
       @lumberjack = Lumberjack::Beats::Server.new(
         :address => @bind, :port => @port, :ssl => @use_ssl, :ssl_certificate => @ssl_certificate,
-        :ssl_key => @ssl_key, :ssl_key_passphrase => @ssl_key_passphrase)
+        :ssl_key => @ssl_key, :ssl_key_passphrase => @ssl_key_passphrase, :ssl_version => @ssl_version, :ssl_ciphers => @ssl_ciphers)
       # Lumberjack::Beats::Server depends on normal accept so we need to launch thread for each connection.
       # TODO: Re-implement Beats Server with Cool.io for resource control
       @thread_pool = Concurrent::CachedThreadPool.new(:idletime => 15) # idletime setting is based on logstash beats input

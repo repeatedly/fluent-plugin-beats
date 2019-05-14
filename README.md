@@ -58,7 +58,7 @@ Configuration example:
 
   Limit the number of connections from beat instances. Default is unlimited.
 
-**use_ssl**, **ssl_certificate**, **ssl_key**, **ssl_key_passphrase**
+**use_ssl**, **ssl_certificate**, **ssl_key**, **ssl_key_passphrase**, **ssl_version**, **ssl_ciphers**
 
   For lumberjack protocol.
 
