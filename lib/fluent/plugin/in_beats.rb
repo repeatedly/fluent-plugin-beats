@@ -128,6 +128,7 @@ module Fluent::Plugin
           rescue => e
             log.error "unexpected error", :error => e.to_s
             log.error_backtrace
+            router.emit_error_event(tag, time, record, e)
           end
         }
       end
